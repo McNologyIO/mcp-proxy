@@ -1,44 +1,34 @@
-# Build stage
+# Build stage with explicit platform specification
 FROM ghcr.io/astral-sh/uv:python3.12-alpine AS uv
 
+# Install the project into /app
 WORKDIR /app
-COPY package.json /app/package.json
+
+# Enable bytecode compilation
 ENV UV_COMPILE_BYTECODE=1
+
+# Copy from the cache instead of linking since it's a mounted volume
 ENV UV_LINK_MODE=copy
 
+# Install the project's dependencies using the lockfile and settings
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    --mount=type=bind,source=package.json,target=package.json \
     uv sync --frozen --no-install-project --no-dev --no-editable
 
+# Then, add the rest of the project source code and install it
+# Installing separately from its dependencies allows optimal layer caching
 ADD . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev --no-editable
 
-# Final runtime image
+# Final stage with explicit platform specification
 FROM python:3.12-alpine
 
-# ✅ Add this line to install node/npm/npx
-RUN apk add --no-cache nodejs npm
-
-# Create app user (optional security step)
-RUN addgroup -S app && adduser -S app -G app
-
-# Copy virtualenv
 COPY --from=uv --chown=app:app /app/.venv /app/.venv
 
-# Make sure mcp-proxy is on the PATH
+# Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Create entrypoint script
-RUN printf '#!/bin/sh\nexec mcp-proxy --port=8000 --host=0.0.0.0 --pass-environment --named-server-config /home/app/.config/google-calendar-mcp/server_config.json\n' \
-    > /entrypoint.sh && chmod +x /entrypoint.sh
-
-# Optional: copy config if needed
-# COPY server_config.json /root/.config/google-calendar-mcp/server_config.json
-
-USER app
-
-EXPOSE 8000
-
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["mcp-proxy --port 8000 --host 0.0.0.0 --transport sse --pass-environment --named-server-config /app/server_config.json"]
