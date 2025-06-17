@@ -2,6 +2,7 @@
 FROM ghcr.io/astral-sh/uv:python3.12-alpine AS uv
 
 WORKDIR /app
+COPY package.json /app/package.json
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 
