@@ -31,7 +31,7 @@ COPY --from=uv --chown=app:app /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 RUN echo '#!/bin/bash\n\
-mcp-proxy --sse-port=8000 --sse-host=0.0.0.0 --pass-environment -- npx @cocal/google-calendar-mcp' \
+mcp-proxy --port=8000 --host=0.0.0.0 --pass-environment --named-server-config /root/.config/google-calendar-mcp/server_config.json' \
 > /entrypoint.sh && chmod +x /entrypoint.sh
 
 EXPOSE 8000
