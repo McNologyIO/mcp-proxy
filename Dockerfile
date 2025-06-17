@@ -36,4 +36,5 @@ RUN printf '#!/bin/sh\nexec mcp-proxy --port=8000 --host=0.0.0.0 --pass-environm
 USER app
 
 EXPOSE 8000
+RUN apk add --no-cache nodejs npm
 ENTRYPOINT ["/entrypoint.sh"]
