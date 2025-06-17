@@ -1,6 +1,6 @@
 # Build stage
 FROM ghcr.io/astral-sh/uv:python3.12-alpine AS uv
-
+RUN apk add --no-cache nodejs npm
 WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
@@ -36,5 +36,5 @@ RUN printf '#!/bin/sh\nexec mcp-proxy --port=8000 --host=0.0.0.0 --pass-environm
 USER app
 
 EXPOSE 8000
-RUN apk add --no-cache nodejs npm
+
 ENTRYPOINT ["/entrypoint.sh"]
