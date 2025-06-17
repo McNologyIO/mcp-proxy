@@ -1,6 +1,6 @@
 # Build stage
 FROM ghcr.io/astral-sh/uv:python3.12-alpine AS uv
-RUN apk add --no-cache nodejs npm
+
 WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
@@ -16,6 +16,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Final runtime image
 FROM python:3.12-alpine
+
+# ✅ Add this line to install node/npm/npx
+RUN apk add --no-cache nodejs npm
 
 # Create app user (optional security step)
 RUN addgroup -S app && adduser -S app -G app
