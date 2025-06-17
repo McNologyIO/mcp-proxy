@@ -30,4 +30,4 @@ COPY --from=uv --chown=app:app /app/.venv /app/.venv
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
-ENTRYPOINT ["mcp-proxy"]
+ENTRYPOINT ["mcp-proxy --sse-port=8000 --sse-host=0.0.0.0 --pass-environment -- npx @cocal/google-calendar-mcp"]
