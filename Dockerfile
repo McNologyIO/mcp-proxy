@@ -27,7 +27,7 @@ COPY --from=uv --chown=app:app /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Create entrypoint script
-RUN printf '#!/bin/sh\nexec mcp-proxy --port=8000 --host=0.0.0.0 --pass-environment --named-server-config /root/.config/google-calendar-mcp/server_config.json\n' \
+RUN printf '#!/bin/sh\nexec mcp-proxy --port=8000 --host=0.0.0.0 --pass-environment --named-server-config /home/app/.config/google-calendar-mcp/server_config.json\n' \
     > /entrypoint.sh && chmod +x /entrypoint.sh
 
 # Optional: copy config if needed
